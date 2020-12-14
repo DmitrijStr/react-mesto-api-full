@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://localhost:3008';
+export const BASE_URL = `${window.location.protocol}${process.env.REACT_APP_API_URL || '//localhost:3008'}`;
 
 const checkResponse = (res) => res.ok ? res.json() : Promise.reject(`Error: ${res.status}`);
 
