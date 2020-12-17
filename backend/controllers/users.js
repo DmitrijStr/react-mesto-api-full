@@ -4,6 +4,7 @@ const userModel = require('../models/user.js');
 const NotFoundError = require('../errors/not-found-err.js');
 const BadReqestError = require('../errors/bad-reqest.js');
 const UnauthorizedError = require('../errors/unauthorized-err.js');
+const ConflictError = require('../errors/conflict-err.js');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -31,8 +32,11 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => res.status(200).send({ data: { _id: user._id, email: user.email } }))
-    .catch(() => {
-      next(new BadReqestError('Переданы некорректные данные'));
+    .catch((err) => {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        return next(new ConflictError('данный email уже зарегистрирован'));
+      }
+      return next(new BadReqestError('Переданы некорректные данные'));
     });
 };
 
@@ -55,7 +59,6 @@ module.exports.login = (req, res, next) => {
 
 module.exports.patchUser = (req, res, next) => {
   const { name, about } = req.body;
-  console.log(req.user._id);
   userModel.findOneAndUpdate(
     { _id: req.user._id },
     {
@@ -65,7 +68,6 @@ module.exports.patchUser = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-      // upsert: true,
     },
   )
     .then((user) => res.send(user))
@@ -87,7 +89,6 @@ module.exports.patchAvatar = (req, res, next) => {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => res.send(user))

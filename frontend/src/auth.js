@@ -1,4 +1,5 @@
-export const BASE_URL = `${window.location.protocol}${process.env.REACT_APP_API_URL || '//localhost:3008'}`;
+// export const BASE_URL = `${window.location.protocol}${process.env.REACT_APP_API_URL || '//localhost:3008'}`;
+export const BASE_URL = '//localhost:3008';
 
 const checkResponse = (res) => res.ok ? res.json() : Promise.reject(`Error: ${res.status}`);
 
@@ -89,7 +90,7 @@ const patchAvatar = (token, newData) => {
 }
 
 const putLike = (token, id) => {
-	return fetch(`${BASE_URL}/cards/likes/${id}`, {
+	return fetch(`${BASE_URL}/cards/${id}/likes`, {
 		method: 'PUT',
 		headers: {
 			"Content-Type": "application/json",
@@ -100,7 +101,7 @@ const putLike = (token, id) => {
 }
 
 const removeLike = (token, id) => {
-	return fetch(`${BASE_URL}/cards/likes/${id}`, {
+	return fetch(`${BASE_URL}/cards/${id}/likes`, {
 		method: 'DELETE',
 		headers: {
 			"Content-Type": "application/json",

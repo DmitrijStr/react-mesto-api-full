@@ -4,6 +4,7 @@ const cardsRouter = require('./cards.js');
 const usersRouter = require('./users.js');
 const { login, createUser } = require('../controllers/users.js');
 const auth = require('../middlewares/auth.js');
+const NotFoundError = require('../errors/not-found-err.js');
 
 router.get('/crash-test', () => {
   setTimeout(() => {
@@ -13,15 +14,15 @@ router.get('/crash-test', () => {
 
 router.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required(),
-    password: Joi.string().required().min(8),
+    email: Joi.string().email().required(),
+    password: Joi.string().trim().required().min(8),
   }),
 }), createUser);
 
 router.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required(),
-    password: Joi.string().required().min(8),
+    email: Joi.string().email().required(),
+    password: Joi.string().trim().required().min(8),
   }),
 }), login);
 
@@ -29,8 +30,8 @@ router.use(auth);
 router.use('/users', usersRouter);
 router.use('/cards', cardsRouter);
 
-// router.use('/*', (req, res) => {
-//   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
-// });
+router.use('/*', (req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
+});
 
 module.exports = router;

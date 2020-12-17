@@ -1,5 +1,6 @@
 const usersRouter = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const { joiUrlTest } = require('../utils/utils.js');
 const {
   getUsers,
   getUser,
@@ -11,7 +12,7 @@ usersRouter.get('/', getUsers);
 
 usersRouter.get('/me', celebrate({
   headers: Joi.object().keys({
-    id: Joi.string().alphanum().length(24),
+    id: Joi.string().hex().length(24),
   }).unknown(true),
 }), getUser);
 
@@ -24,7 +25,7 @@ usersRouter.patch('/me', celebrate({
 
 usersRouter.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required(),
+    avatar: Joi.string().required().custom(joiUrlTest),
   }),
 }), patchAvatar);
 
